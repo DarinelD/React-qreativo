@@ -1,57 +1,21 @@
-import { useCart } from "../context/CartContext";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../services/firebase";
 import { useState } from "react";
 
-function CheckoutForm() {
-  const { cart } = useCart();
-  const [orderId, setOrderId] = useState(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+function CheckoutForm({ onConfirm }) {
+  const [buyer, setBuyer] = useState({
+    name: "",
+    email: ""
+  });
 
-  const total = cart.reduce((acc, prod) => acc + prod.price * prod.quantity, 0);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validación básica
-    if (!name || !email) {
-      alert("Por favor completa todos los campos");
+    if (!buyer.name || !buyer.email) {
+      alert("Completa todos los campos");
       return;
     }
 
-    setLoading(true);
-
-    const order = {
-      buyer: { name, email },
-      items: cart,
-      total,
-      date: serverTimestamp(),
-    };
-
-    try {
-      const res = await addDoc(collection(db, "orders"), order);
-      setOrderId(res.id);
-    } catch (error) {
-      console.error("Error creando la orden:", error);
-      alert("Ocurrió un error al enviar tu orden.");
-    } finally {
-      setLoading(false);
-    }
+    onConfirm(buyer);
   };
-
-  // Mostrar mensaje con ID de orden si ya se creó
-  if (orderId) {
-    return (
-      <div className="text-center mt-20">
-        <h2 className="text-2xl font-bold text-green-600">¡Gracias por tu compra! {name}</h2>
-        <p className="mt-4">
-          Tu número de orden es: <span className="font-semibold">{orderId}</span>
-        </p>
-      </div>
-    );
-  }
 
   return (
     <form
@@ -60,34 +24,31 @@ function CheckoutForm() {
     >
       <h2 className="text-xl font-bold mb-4">Checkout</h2>
 
-      {/* Input de nombre */}
       <label className="block mb-2 font-medium">Nombre</label>
       <input
         type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded mb-4"
-        placeholder="Ingresa tu nombre"
+        className="w-full p-2 border rounded mb-4"
+        value={buyer.name}
+        onChange={(e) =>
+          setBuyer({ ...buyer, name: e.target.value })
+        }
       />
 
-      {/* Input de correo */}
       <label className="block mb-2 font-medium">Correo</label>
       <input
         type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded mb-4"
-        placeholder="Ingresa tu correo"
+        className="w-full p-2 border rounded mb-4"
+        value={buyer.email}
+        onChange={(e) =>
+          setBuyer({ ...buyer, email: e.target.value })
+        }
       />
 
       <button
         type="submit"
-        disabled={loading}
-        className={`w-full py-2 rounded text-white ${
-          loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-        }`}
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
       >
-        {loading ? "Enviando..." : "Confirmar compra"}
+        Confirmar compra
       </button>
     </form>
   );
