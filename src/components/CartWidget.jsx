@@ -1,8 +1,13 @@
-function Button ({text, styles}) {
+import { useCart } from "../context/CartContext";
+
+function CartWidget() {
+  const { totalQuantity } = useCart();
+
   return (
-    <button className={`px-4 rounded ${styles}`}>
-      {text}
-    </button>
-  )
+    <div className="text-white font-bold">
+      🛒 {totalQuantity}
+    </div>
+  );
 }
-export default Button
+
+export default CartWidget;
