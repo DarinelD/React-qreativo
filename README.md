@@ -87,6 +87,7 @@ src/
 │ ├── Cart
 │ ├── CartItem
 │ └── CheckoutForm
+│ └── Checkout
 │
 ├── containers/
 │ ├── ItemListContainer
@@ -94,9 +95,6 @@ src/
 │
 ├── context/
 │ └── CartContext
-│
-├── pages/
-│ └── Checkout
 │
 ├── services/
 │ └── firebase.js
